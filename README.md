@@ -1,2 +1,2 @@
 # motorcycle-pos
-Production point-of-sale system for a motorcycle shop — React PWA + Laravel 13 API on Azure. Sales, parts inventory, service work orders, and customer records.
+A production point-of-sale system for a working motorcycle shop in Malaysia. It combines retail (parts and accessories sales with inventory tracking) and workshop operations (service and repair work orders tied to customer vehicles), and handles real payments including cash and DuitNow QR. The frontend is a React PWA; the backend is a Laravel 13 JSON API; everything runs on Azure (App Service, Static Web Apps, and MySQL). See DESIGN.md for architecture and decisions, and CLAUDE.md for conventions.
