@@ -76,9 +76,9 @@ build two separate money flows.
 | Decision | Choice | Why |
 |---|---|---|
 | Repo layout | Single repo, two toolchains (`/api`, `/web`), path-filtered deploys | Atomic frontend+backend changes, better AI context, low overhead for a solo dev. No Nx/Turborepo — those are for multi-package JS graphs. |
-| Backend shape | Laravel API-only + React SPA | Clean client/server boundary; good for learning; React stays the single client. |
+| Backend shape | Laravel API-only + React SPA | Clean client/server boundary; React stays the single client; keeps API reusable for a future native app. |
 | Auth | Laravel Sanctum (tokens) | Simple, well-documented, fits an SPA. |
-| Database | MySQL via Azure Flexible Server | Most common Laravel pairing, gentlest to learn, managed ops (backups/patching). |
+| Database | MySQL via Azure Flexible Server | Most common Laravel pairing, mature ecosystem/tooling, managed ops (backups/patching). |
 | Hosting | App Service (API) + Static Web Apps (web) | Managed, low-ops, cheap tiers, native GitHub Actions deploy. |
 | Money handling | Integer sen + DB transactions | Financial correctness is the top non-functional requirement. |
 | Payments | Local aggregator + verified webhook | Malaysian customers expect DuitNow QR/FPX/e-wallets; Stripe alone lacks DuitNow QR. |
