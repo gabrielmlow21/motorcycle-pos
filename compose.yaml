@@ -1,0 +1,46 @@
+# Local development database only.
+#
+# This exists so local development runs against the same engine as production
+# (MySQL 8.0 on Azure Database for MySQL Flexible Server) rather than SQLite.
+# That matters here: SQLite treats `SELECT ... FOR UPDATE` as a no-op and locks
+# the whole database file instead of a row, so the concurrency behaviour behind
+# stock deduction and payments cannot be exercised on it.
+#
+# The application itself is NOT containerised — it runs natively via
+# `php artisan serve` and `npm run dev`, matching the App Service / Static Web
+# Apps deployment target.
+#
+# The credentials below are local-only throwaways and deliberately committed so
+# `make setup` works with no manual steps. Production credentials live in App
+# Service configuration and Key Vault, never here.
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: motorcycle-pos-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: local_dev_only
+      MYSQL_DATABASE: pos
+      MYSQL_USER: posadmin
+      MYSQL_PASSWORD: local_dev_only
+    ports:
+      # Host 3306 -> container 3306. If something already uses 3306 locally,
+      # change the left-hand number here and DB_PORT in api/.env to match.
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      # Runs once on first boot of an empty volume: creates the test database
+      # and grants posadmin access to it.
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # $$ escapes to a literal $, so the container's shell expands its own
+      # MYSQL_ROOT_PASSWORD rather than repeating the value here.
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\""]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+volumes:
+  mysql-data:
