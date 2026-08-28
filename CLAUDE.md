@@ -57,4 +57,4 @@ Frontend (run inside `/web`):
 
 ## Where to look
 - Architecture, data model, and the rationale behind decisions → **DESIGN.md**.
-- The open decisions at the top of DESIGN.md are **not yet finalized** — do not assume them.
+- The decisions at the top of DESIGN.md are confirmed (2026-08-28) — build against them.

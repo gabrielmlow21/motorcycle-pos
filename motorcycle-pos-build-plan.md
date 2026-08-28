@@ -18,18 +18,18 @@ So each phase below has three columns of thinking: *what the AI builds*, *what y
 
 ---
 
-## 2. Decisions still open (I did not assume these)
+## 2. Decisions (confirmed)
 
-These genuinely change the build. I've given a recommendation for each so you're not blocked, but confirm them before Phase 2.
+These genuinely change the build. Confirmed 2026-08-28 — all four went with the recommended default.
 
-| Decision | Why it matters | My recommended default |
+| Decision | Why it matters | Confirmed direction |
 |---|---|---|
 | **Shop annual turnover vs RM1M** | Determines whether MyInvois e-invoicing is legally required. Above RM1M → mandatory (RM1m–RM5m band enforced Jan 2027, soft launch 2026). Below RM1M → currently exempt. | **Design the invoice layer to be MyInvois-ready regardless**, but only wire up the API submission if you're above (or approaching) RM1M. Cheap to design in, expensive to retrofit. |
 | **Offline resilience** | A shop can't stop selling when the internet drops. Full offline-first is complex; online-only is simpler but risky. | **Online-first with a graceful degraded mode**: cart works locally and queues the sale to sync when the connection returns. Avoid full offline-first sync for v1. |
 | **Payment provider** | Malaysian customers expect DuitNow QR, FPX, and e-wallets (Touch 'n Go, GrabPay). Stripe alone won't cover DuitNow QR. | **A local aggregator** — HitPay, Billplz, Fiuu, or Curlec — that exposes DuitNow QR + FPX + e-wallets through one API and supports in-person POS. Keep **cash** as a first-class method too. |
 | **Hardware** | Real POS needs receipt printing and barcode scanning. | **Thermal receipt printer (ESC/POS)** + **USB barcode scanner (keyboard-wedge)** + optional **cash drawer** triggered by the printer. Scanners are trivial (they type into a focused input); printing needs a small bridge — see Phase 5. |
 
-If any default is wrong for you, tell me and I'll adjust the affected phases.
+Locked in — Phase 2 onward can build against these without re-asking.
 
 ---
 

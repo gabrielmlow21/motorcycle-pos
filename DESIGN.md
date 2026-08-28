@@ -5,19 +5,19 @@ CLAUDE.md holds the day-to-day conventions and commands.
 
 ---
 
-## Open decisions (not yet finalized — do not assume)
+## Confirmed decisions (2026-08-28)
 
 1. **MyInvois e-invoicing scope** — Required only if shop turnover is at/above RM1M (RM1m–RM5m
    band enforced from Jan 2027, soft launch through 2026). Below RM1M is currently exempt.
    *Plan:* design the invoice layer to be MyInvois-ready regardless; wire up API submission
    only if in (or approaching) scope.
-2. **Offline resilience** — *Leaning:* online-first with a degraded local cart that queues the
-   sale and syncs when the connection returns. Not full offline-first for v1.
-3. **Payment provider** — *Leaning:* a local aggregator (HitPay / Billplz / Fiuu / Curlec)
-   exposing DuitNow QR + FPX + e-wallets through one API, with in-person POS support. Cash is
-   a first-class method.
-4. **Hardware** — *Leaning:* thermal ESC/POS receipt printer, USB keyboard-wedge barcode
-   scanner, optional cash drawer triggered by the printer.
+2. **Offline resilience** — Online-first with a degraded local cart that queues the sale and
+   syncs when the connection returns. Not full offline-first for v1.
+3. **Payment provider** — A local aggregator (HitPay / Billplz / Fiuu / Curlec) exposing
+   DuitNow QR + FPX + e-wallets through one API, with in-person POS support. Cash is a
+   first-class method.
+4. **Hardware** — Thermal ESC/POS receipt printer, USB keyboard-wedge barcode scanner,
+   optional cash drawer triggered by the printer.
 
 ---
 
