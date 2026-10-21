@@ -23,26 +23,27 @@ CLAUDE.md holds the day-to-day conventions and commands.
 
 ## System overview
 
-```
-   Shop tablet
-   ┌─────────────────┐        HTTPS / JSON        ┌──────────────────────┐
-   │  React PWA       │  ───────────────────────► │  Laravel 13 API       │
-   │  (Static Web App)│  ◄─────────────────────── │  (App Service, PHP)   │
-   └─────────────────┘                            └──────────┬───────────┘
-                                                              │
-                          ┌───────────────────────────────────┼───────────────────────┐
-                          │                  │                 │                        │
-                   ┌──────▼──────┐   ┌────────▼──────┐  ┌───────▼───────┐     ┌──────────▼─────────┐
-                   │ MySQL        │   │ Blob Storage  │  │ Key Vault     │     │ Payment aggregator │
-                   │ (Flexible    │   │ images,       │  │ secrets       │     │ DuitNow QR / FPX / │
-                   │  Server)     │   │ receipts      │  │               │     │ e-wallets (webhook)│
-                   └──────────────┘   └───────────────┘  └───────────────┘     └────────────────────┘
-                          │
-                   ┌──────▼──────────────┐        (only if in scope)
-                   │ MyInvois (LHDN) API │  ◄── invoice submission
-                   └─────────────────────┘
+Diagrams in this file are [Mermaid](https://mermaid.js.org/) — GitHub renders them; edit them as text.
 
-   Application Insights observes the API (errors, latency, failed payments → alerts).
+```mermaid
+flowchart LR
+  tablet["Shop tablet<br/>React PWA<br/>(Static Web Apps)"]
+  api["Laravel 13 API<br/>(App Service, PHP)"]
+  db[("MySQL<br/>Flexible Server")]
+  blob["Blob Storage<br/>images, receipts"]
+  kv["Key Vault<br/>secrets"]
+  pay["Payment aggregator<br/>DuitNow QR / FPX / e-wallets"]
+  myinvois["MyInvois (LHDN) API<br/>only if in scope"]
+  insights["Application Insights<br/>errors, latency, failed payments"]
+
+  tablet <-->|"HTTPS / JSON<br/>Sanctum token"| api
+  api --> db
+  api --> blob
+  api --> kv
+  api -->|"create payment"| pay
+  pay -->|"signed webhook"| api
+  api -.->|"invoice submission"| myinvois
+  insights -.->|"observes, alerts"| api
 ```
 
 The React PWA is the only client. The Laravel API is the only thing that touches the database,
@@ -68,6 +69,102 @@ money, and auth. Payment confirmation arrives via a server-to-server webhook, ne
 
 A retail sale and a completed work order **converge on the same payment + invoice path** — do not
 build two separate money flows.
+
+```mermaid
+erDiagram
+  users ||--o{ sales : "rings up"
+  users ||--o{ work_orders : "assigned to"
+  customers ||--o{ vehicles : owns
+  customers |o--o{ sales : "buys (walk-ins have none)"
+  customers ||--o{ work_orders : requests
+  vehicles ||--o{ work_orders : "serviced in"
+  suppliers ||--o{ products : supplies
+  sales ||--|{ sale_items : contains
+  products ||--o{ sale_items : "sold as"
+  work_orders ||--o{ labor_lines : contains
+  work_orders ||--o{ parts_used : contains
+  products ||--o{ parts_used : "used as"
+  products ||--o{ inventory_movements : "stock history"
+  sales |o--o{ payments : "paid by"
+  work_orders |o--o{ payments : "paid by"
+  sales |o--o| invoices : "documented by"
+  work_orders |o--o| invoices : "documented by"
+
+  users {
+    string role "cashier, mechanic, manager"
+  }
+  products {
+    string sku
+    string barcode
+    int cost_price_sen
+    int sell_price_sen
+    int reorder_level
+  }
+  inventory_movements {
+    int quantity "signed: + in, - out"
+    string reason "sale, restock, adjustment, service"
+    string reference "the sale, work order, etc."
+  }
+  payments {
+    int amount_sen
+    string method "cash, duitnow_qr, fpx, ewallet, card"
+    string provider_reference "unique, for idempotency"
+  }
+```
+
+### Work order lifecycle
+
+```mermaid
+stateDiagram-v2
+  [*] --> open
+  open --> in_progress : mechanic starts
+  in_progress --> done : work finished
+  done --> invoiced : invoice issued
+  invoiced --> paid : verified webhook or recorded cash
+  paid --> [*]
+```
+
+`paid` is set only by the server — never by a request from the tablet.
+
+---
+
+## Sale & payment flow
+
+```mermaid
+sequenceDiagram
+  autonumber
+  actor Cashier
+  participant Web as Tablet (React PWA)
+  participant API as Laravel API
+  participant DB as MySQL
+  participant Pay as Payment aggregator
+
+  Cashier->>Web: Scan items, choose payment method
+  alt Cash
+    Web->>API: POST /sales (items, cash tendered)
+    API->>API: Price lines and SST server-side, in sen
+    API->>DB: One transaction: sale (paid), sale_items, stock movements, cash payment
+    API-->>Web: Sale paid, change due (calculated server-side)
+  else DuitNow QR / FPX / e-wallet
+    Web->>API: POST /sales (items, method)
+    API->>API: Price lines and SST server-side, in sen
+    API->>DB: Insert sale (pending) and sale_items
+    API->>Pay: Create payment request
+    Pay-->>API: QR code / payment link
+    API-->>Web: Show QR to customer
+    Note over Pay: Customer scans and pays in their bank or e-wallet app
+    Pay->>API: Webhook (signed)
+    API->>API: Verify signature
+    API->>DB: One transaction: if provider_reference already recorded, stop. Else payment, stock movements, sale paid
+    Web->>API: Check sale status
+    API-->>Web: Paid
+  end
+  Web->>Cashier: Print receipt
+```
+
+**Open question:** for QR/FPX/e-wallet, the diagram deducts stock when the webhook confirms
+payment, so stock and payment land in one transaction. The trade-off is that an item can be
+sold twice while a QR is pending. Confirm this, or choose to reserve stock when the sale is created.
 
 ---
 
