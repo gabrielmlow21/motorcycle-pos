@@ -18,6 +18,12 @@ CLAUDE.md holds the day-to-day conventions and commands.
    first-class method.
 4. **Hardware** — Thermal ESC/POS receipt printer, USB keyboard-wedge barcode scanner,
    optional cash drawer triggered by the printer.
+5. **Build locally first, deploy later** *(added 2026-10-21)* — This is a learning project with
+   no hosting budget. It may later serve one small shop. All development runs locally (Laravel
+   + local MySQL + Vite). CI (tests and lint on GitHub Actions) stays on because it's free.
+   The Azure setup in `phase-0-runbook.md` waits until the shop is close to real use. At that
+   point, pick a host sized for one small shop: the Azure plan below, or a cheaper option
+   such as a small VPS. Don't use free tiers once it handles real money.
 
 ---
 
@@ -176,7 +182,7 @@ sold twice while a QR is pending. Confirm this, or choose to reserve stock when 
 | Backend shape | Laravel API-only + React SPA | Clean client/server boundary; React stays the single client; keeps API reusable for a future native app. |
 | Auth | Laravel Sanctum (tokens) | Simple, well-documented, fits an SPA. |
 | Database | MySQL via Azure Flexible Server | Most common Laravel pairing, mature ecosystem/tooling, managed ops (backups/patching). |
-| Hosting | App Service (API) + Static Web Apps (web) | Managed, low-ops, cheap tiers, native GitHub Actions deploy. |
+| Hosting | App Service (API) + Static Web Apps (web) — **deferred**; local-only for now (decision 5) | Managed, low-ops, cheap tiers, native GitHub Actions deploy. Costs about RM130–180/month on B1 + B1ms, so it's not worth paying for until real use. |
 | Money handling | Integer sen + DB transactions | Financial correctness is the top non-functional requirement. |
 | Payments | Local aggregator + verified webhook | Malaysian customers expect DuitNow QR/FPX/e-wallets; Stripe alone lacks DuitNow QR. |
 

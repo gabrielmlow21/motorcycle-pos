@@ -4,6 +4,13 @@ Goal: by the end, a `git push` to `main` deploys the correct half automatically,
 React PWA loads from a live URL, and it can call the live Laravel API. **No real features
 yet** — this phase is purely about proving the pipeline end to end.
 
+> **Status: deferred (2026-10-21).** We're building locally first and deploying later. See
+> decision 5 in DESIGN.md. Nothing in this runbook is needed for day-to-day development.
+> Come back to it when the shop is close to real use. Following it creates resources that
+> **bill by the hour** (roughly RM130–180/month for the B1 plan + B1ms MySQL; check the Azure
+> pricing calculator). Before Step 2, set a budget alert under Cost Management + Billing →
+> Budgets.
+
 Everything here is done through the Azure portal at https://portal.azure.com. No Azure CLI
 required. Work top to bottom.
 
