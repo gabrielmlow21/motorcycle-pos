@@ -2,6 +2,5 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// This is a JSON API with no server-rendered pages; the React PWA is the only client.
+Route::get('/', fn () => ['status' => 'ok']);
