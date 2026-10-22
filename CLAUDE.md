@@ -9,11 +9,11 @@ A point-of-sale (POS) system for a motorcycle shop in Malaysia. This is a **real
 system that handles real money** — correctness of financial data and auth matters more than
 speed of delivery. Two halves in one repo (monorepo-lite):
 
-- `/api` — Laravel 13 (PHP 8.3+) JSON API. The single source of truth for data, money, and auth.
+- `/api` — Laravel 13 (PHP 8.4+) JSON API. The single source of truth for data, money, and auth.
 - `/web` — React PWA (Vite + TypeScript). The only client of the API. Runs on a shop tablet.
 
 ## Stack
-- Backend: Laravel 13, PHP 8.3+, MySQL (Azure Database for MySQL Flexible Server), Sanctum auth.
+- Backend: Laravel 13, PHP 8.4+, MySQL (Azure Database for MySQL Flexible Server), Sanctum auth.
 - Frontend: React + Vite, installable PWA, TypeScript.
 - Hosting: API on Azure App Service (Linux/PHP); web on Azure Static Web Apps.
 - CI/CD: GitHub Actions, path-filtered so a frontend change never redeploys the backend.
