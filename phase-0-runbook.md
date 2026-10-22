@@ -114,7 +114,7 @@ Portal → search **App Services** → **Create** → **Web App**.
 - Resource group: `motorcycle-pos-rg`
 - Name: `motorcycle-pos-api`
 - Publish: **Code**
-- Runtime stack: **PHP 8.3** (or the newest 8.x offered)
+- Runtime stack: **PHP 8.4** (or the newest 8.x offered)
 - Operating System: **Linux**
 - Region: **Southeast Asia**
 - Pricing plan: create a new plan named `motorcycle-pos-plan` and click **Change size** to pick

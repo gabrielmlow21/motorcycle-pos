@@ -6,7 +6,7 @@ work orders tied to customer vehicles), and handles real payments including cash
 
 Two halves in one repo:
 
-- `/api` — Laravel 13 (PHP 8.3+) JSON API. The single source of truth for data, money, and auth.
+- `/api` — Laravel 13 (PHP 8.4+) JSON API. The single source of truth for data, money, and auth.
 - `/web` — React PWA (Vite + TypeScript). The only client of the API. Runs on a shop tablet.
 
 ## Setup on a new machine
